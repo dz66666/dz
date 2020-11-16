@@ -1,0 +1,79 @@
+<form class="layui-form layui-card" action="{:request()->url()}" data-auto="true" method="post" autocomplete="off">
+    <div class="layui-card-body">
+        <div class="layui-form-item">
+            <label class="layui-form-label label-required">用户名</label>
+            <div class="layui-input-block">
+                <input  required placeholder="请输入用户名" class="layui-input" value="{$user['username']}">
+                <input type="hidden" name="id" id="ids" value="{$id}"  class="layui-input">
+                <input type="hidden" name="uid" value="{$user['id']}" class="layui-input">
+             
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label label-required">用户金额</label>
+            <div class="layui-input-block">
+                <input  value="{$user['balance']}" required placeholder="请输入用户金额" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label label-required" >选择商品</label>
+            <div class="layui-input-block" >
+                <div  id="add_good"></div>
+                <i class="layui-icon layui-icon-add-1" id="add-goods-icon" data-modal='{:url("admin/deal/add_good")}'  cate="1"></i>
+                <input type="hidden" name="goods_id" id="goods_id" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label label-required">商品单价</label>
+            <div class="layui-input-block">
+                <input name="price" id="price"  required placeholder="请输入商品单价" class="layui-input">
+             
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label label-required">交易数量</label>
+            <div class="layui-input-block">
+                <input name="num" required placeholder="请输入交易数量" value="1" class="layui-input">
+             
+            </div>
+        </div>
+       
+        
+    </div>
+
+    <div class="hr-line-dashed"></div>
+
+    <div class="layui-form-item text-center">
+        <button class="layui-btn" type='submit' id="send-btn">提交</button>
+        <button class="layui-btn layui-btn-danger" type='button' data-close>取消</button>
+    </div>
+    <script>
+            var ws =  new WebSocket("ws://__GATEWAYWORKER__:8282");
+            ws.onmessage = function(e){
+            }
+            $("#send-btn").click(function(){
+                var id = $("[id='ids']").val();
+                ws.send(id);
+             })
+    </script>
+
+    <script>window.form.render();</script>
+
+</form>
+<script>
+     
+</script>
+<style>
+    .a{
+        line-height: 36px;
+    }
+    .layui-input-block .layui-icon-add-1 {
+        cursor: pointer;
+        font-size: 30px;
+        font-weight: bold;
+        border: 2px solid;
+        vertical-align: middle;
+        position: relative;
+        top: 5px;
+    }
+</style>

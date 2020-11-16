@@ -1,0 +1,94 @@
+{extend name='main'}
+
+{block name="content"}
+
+<div class="think-box-shadow">
+    {include file='deal/order_list_search'}
+    <table class="layui-table margin-top-15" lay-skin="line">
+        {notempty name='list'}
+        <thead>
+        <tr>
+            <th class='text-left nowrap' onclick="dd()">用户名</th>
+            <th class='text-left nowrap'>手机号</th>
+            <th class='text-left nowrap'>真实姓名</th>
+            <th class='text-left nowrap'>实时变动的余额</th>
+            <th class='text-left nowrap'>商品名称</th>
+            <th class='text-left nowrap'>交易数额</th>
+            <th class='text-left nowrap'>佣金</th>
+            <th class='text-left nowrap'>下单时间</th>
+            <th class='text-left nowrap'>交易状态</th>
+            <th class='text-left nowrap'>操作</th>
+        </tr>
+        </thead>
+        {/notempty}
+        <tbody>
+        {foreach $list as $key=>$vo}    
+        <tr>
+            <td class='text-left nowrap'>{$vo.username}</td>
+            <td class='text-left nowrap'>{$vo.tel}</td>
+            <td class='text-left nowrap'>{$vo.usernames}</td>
+            <td class='text-left nowrap'>{$vo.balance}</td>
+            <td class='text-left nowrap'>{$vo.goods_name}</td>
+            <td class='text-left nowrap'>¥{$vo.num}</td>
+            <td class='text-left nowrap'>¥{$vo.commission}</td>
+            <td class='text-left nowrap'>
+                {$vo.addtime|format_datetime}
+            </td>
+            <td class='text-left nowrap'>
+                {switch $vo.status}
+                    {case 0}
+                        {literal}
+                        <!-- {if auth("edit_recharge")}
+                                <a data-csrf="{:systoken('admin/deal/edit_recharge')}" class="layui-btn layui-btn-xs layui-btn" data-action="{:url('edit_recharge',['status'=>2,'id'=>$vo.id])}" data-value="id#{$vo.id};status#2" >确认付款</a>
+                                <a data-csrf="{:systoken('admin/deal/edit_recharge')}" class="layui-btn layui-btn-xs layui-btn-warm" data-action="{:url('edit_recharge',['status'=>3,'id'=>$vo.id])}" data-value="id#{$vo.id};status#3" >取消订单</a>
+                            {/if} -->
+                            等待付款
+                        {/literal}
+                    {/case}
+                    {case 1}完成付款{/case}
+                    {case 2}用户取消{/case}
+                    {case 3}强制付款{/case}
+                    {case 4}系统取消{/case}
+                    {case 5}待审核{/case}
+                    {case 6}审核驳回{/case}
+                {/switch}
+            </td>
+            <td class='text-left nowrap'>
+                <a data-dbclick class="layui-btn layui-btn-xs" data-title="银行卡信息" data-modal='{:url("admin/deal/edit_order")}?id={$vo.uid}'>银行卡信息</a>
+                {if $vo.status==0}
+              
+                <!-- <a data-csrf="{:systoken('admin/deal/do_user_order')}" class="layui-btn layui-btn-xs layui-btn" data-action="{:url('do_user_order')}" data-value="id#{$vo.id};status#3" >强制付款</a>-->
+                <a data-csrf="{:systoken('admin/deal/do_user_order')}" class="layui-btn layui-btn-xs layui-btn-warm" data-action="{:url('do_user_order')}" data-value="id#{$vo.id};status#4" >取消订单</a>
+                {/if}
+
+                {if $vo.status==9}   
+                <a data-dbclick class="layui-btn layui-btn-xs layui-btn-warm" data-title="匹配订单" data-modal='{:url("admin/deal/add_task")}?uid={$vo.uid}&id={$vo.id}'>匹配订单</a>
+         
+                {/if}
+                {if $vo.status==5}
+                <a data-csrf="{:systoken('admin/deal/jiedong')}" class="layui-btn layui-btn-xs layui-btn" data-action="{:url('jiedong')}" data-value="id#{$vo.id};status#3" >审核通过</a>
+                <a data-csrf="{:systoken('admin/deal/bohui')}" class="layui-btn layui-btn-xs layui-btn" data-action="{:url('bohui')}" data-value="id#{$vo.id};status#6" >审核不通过</a>
+                {/if}
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+    <script>
+
+        var ws =  new WebSocket("ws://__GATEWAYWORKER__:8282");
+    ws.onmessage = function(e){
+
+        var str = e.data;
+        str = str.substring(1,str.length-1)
+          if(str == 1){
+                parent.location.reload();
+              
+          }
+    }
+    </script>
+
+    {empty name='list'}<span class="notdata">没有记录哦</span>{else}{$pagehtml|raw|default=''}{/empty}
+
+</div>
+{/block}

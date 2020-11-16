@@ -1,0 +1,69 @@
+{extend name='admin@main'}
+
+{block name="content"}
+
+<div class="layui-card-body ">
+
+    <table class="layui-table layui-form" id="list" lay-filter="test"> </table>
+
+
+</div>
+
+<script type="text/html" id="operate">
+  
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="edit">选择</a> 
+</script>
+<!-- <script src="__ROOT__/static/plugs/layui/layui.js"></script> -->
+    <script>
+
+        layui.use('table', function () {
+                var table = layui.table;
+                //第一个实例
+                table.render({
+                    elem: '#list'
+                    , height: 490
+                    , url: '{:url("admin/deal/add_good")}' //数据接口
+                    , page: true //开启分页
+                    , where: { "list": "list" }
+                    , id: 'test'
+                    , cols: [[ //表头 
+                        { field: 'goods_pic', title: '商品头像', templet:'<div><img src="{{ d.goods_pic }}"></div>',width: 125}
+                        , { field: 'goods_name', title: '商品名称'}
+                        , { field: 'goods_price', title: '商品价格'}
+                        , { field: 'shop_name', title: '店铺名称'}
+                        , { title: "操作", width: 150, align: 'center', toolbar: '#operate' }
+                    ]]
+                    ,limits: [5,10,20,30]
+                    , limit: 10
+                    , parseData: function (res) {
+                        var result;
+                        if (this.page.curr) {
+                            result = res.data.slice(this.limit * (this.page.curr - 1), this.limit * this.page.curr);
+                        } else {
+                            result = res.data.slice(0, this.limit);
+                        }
+                        return {"code": res.code, "msg": res.msg, "count": res.count, "data": result};
+                    }
+                });
+                table.on('row(test)', function(obj){
+                    var img = '<img src='+obj.data.goods_pic+' id="img" style="height: 100px;width: 100px;">';
+                  
+                    if(document.getElementById('img')){
+                        $('#add_good img').attr('src',obj.data.goods_pic);
+                    }else{
+                        $('#add_good').append(img);
+                    }
+                    $('#price').val(obj.data.goods_price)
+                    $('#goods_id').val(obj.data.id)
+                    layer.close(layer.index);//关闭当前弹出层
+            
+                });
+        });
+       
+        
+          
+   
+    </script>
+
+{/block}
+

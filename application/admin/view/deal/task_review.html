@@ -1,0 +1,124 @@
+{extend name='main'}
+
+{block name="content"}
+
+<div class="think-box-shadow">
+    <fieldset>
+        <legend>条件搜索</legend>
+
+
+        <form class="layui-form layui-form-pane form-search" action="{:request()->url()}" onsubmit="return false" method="get" autocomplete="off">
+            {if auth("do_deposit") }
+            <div class="layui-form-item layui-inline" style="margin-right: 10px">
+                <button data-action='{:url("do_deposits2")}' data-csrf="{:systoken('do_deposits2')}" data-rule="id#{key}" class='layui-btn layui-btn-sm layui-btn-danger'>批量通过</button>
+                <button data-action='{:url("do_deposits3")}' data-csrf="{:systoken('do_deposits3')}" data-rule="id#{key}" class='layui-btn layui-btn-sm layui-btn-warning'>批量拒绝</button>
+            </div>
+            {/if}
+
+            <div class="layui-form-item layui-inline">
+                <label class="layui-form-label">手机</label>
+                <div class="layui-input-inline">
+                    <input name="tel" value="{$Think.get.tel|default=''}" placeholder="请输入手机号" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item layui-inline">
+                <label class="layui-form-label">用户名称</label>
+                <div class="layui-input-inline">
+                    <input name="username" value="{$Think.get.username|default=''}" placeholder="请输入用户名称" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item layui-inline">
+                <label class="layui-form-label">发起时间</label>
+                <div class="layui-input-inline">
+                    <input data-date-range name="addtime" value="{$Think.get.addtime|default=''}" placeholder="请选择发起时间" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item layui-inline">
+                <button class="layui-btn layui-btn-primary"><i class="layui-icon">&#xe615;</i> 搜 索</button>
+                {if auth("do_deposit") }
+                <a href="/admin/deal/daochus.html" class="layui-btn layui-btn-danger" ><i class="layui-icon">&#xe615;</i> 导 出</a>
+                {/if}
+            </div>
+        </form>
+    </fieldset>
+    
+    <script>form.render()</script>
+    <table class="layui-table margin-top-15" lay-skin="line" >
+        {notempty name='list'}
+        <thead >
+        <tr>
+            <th class='list-table-check-td think-checkbox'>
+                <input data-auto-none data-check-target='.list-check-box' type='checkbox'>
+            </th>
+
+            <th class='text-left nowrap'>审核用户</th>
+            <th class='text-left nowrap'>手机号码</th>
+            <th class='text-left nowrap'>真实姓名</th>
+            <th class='text-left nowrap'>实时变动的余额</th>
+            <th class='text-left nowrap'>交易金额</th>
+            <th class='text-left nowrap'>数量</th>
+            <th class='text-left nowrap'>获得佣金</th>
+            <th class='text-left nowrap'>图片凭证</th>
+            <th class='text-left nowrap'>发起时间</th>
+
+            <th class='text-left nowrap'>处理时间</th>
+            <th class='text-left nowrap'>完成条件</th>
+            <th class='text-left nowrap'>备注</th>
+            {if auth('do_deposit')}
+                <th class='text-left nowrap'>操作</th>
+            {/if}
+        </tr>
+        </thead>
+        {/notempty}
+        <tbody>
+        {foreach $list as $key=>$vo}
+        <tr style="color: {if condition='$vo.status == 4'}red{/if}">
+            <td class='list-table-check-td think-checkbox'>
+                <input class="list-check-box" value='{$vo.id}' type='checkbox'>
+            </td>
+
+            <td class='text-left nowrap'>{$vo.username}</td>
+            <td class='text-left nowrap'>{$vo.tel}</td>
+            <td class='text-left nowrap'>{$vo.real_name}</td>
+            <td class='text-left nowrap'>¥{$vo.balance}</td>
+            <td class='text-left nowrap'>{$vo.num}</td>
+            <td class='text-left nowrap'>{$vo.goods_count}</td>
+            <td class='text-left nowrap'>{$vo.commission}</td>
+            <td class='text-left nowrap'>
+                <a data-dbclick data-title="查看图片" data-modal='{:url("admin/users/picinfo")}?pic={$vo.info_link}'><img src="{$vo.info_link}" style="width:150px;height:100px;"></a>
+            </td>
+            <td class='text-left nowrap'>{$vo.addtime|format_datetime}</td>
+            <td class='text-left nowrap'>
+                {if $vo.endstime != ''}
+                    {$vo.endstime|format_datetime}
+                {else}
+                    —
+                {/if}
+            </td>
+
+            <td class='text-left nowrap'>{$vo.conditions}</td>
+            
+            <td class='text-left nowrap'>
+               
+            </td>
+            <td class='text-left nowrap'>
+                {switch $vo.status}
+                    {case 1}审核通过{/case}
+                    {case 2}审核驳回{/case}
+                    {case 3}强制完成{/case}
+                    {case 4}审核驳回{/case}
+                {/switch}
+            {if ($vo.status == 5) and auth("do_deposit")}
+                <a class="layui-btn layui-btn-xs" data-csrf="{:systoken('admin/deal/do_deposits')}" data-action="{:url('do_deposits')}" data-value="id#{$vo.id};status#1">通过</a>
+                <a class="layui-btn layui-btn-xs layui-btn-warm" data-csrf="{:systoken('admin/deal/do_deposits')}" data-action="{:url('do_deposits')}" data-value="id#{$vo.id};status#4;uid#{$vo.uid};num#{$vo.num}">驳回</a>
+            {/if}
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+
+    {empty name='list'}<span class="notdata">没有记录哦</span>{else}{$pagehtml|raw|default=''}{/empty}
+
+</div>
+{/block}

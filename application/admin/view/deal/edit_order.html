@@ -1,0 +1,80 @@
+{notempty name='bk_info'}
+{volist name='bk_info' id='vo'}
+
+<form class="layui-form layui-card" action="{:request()->url()}" data-auto="true" method="post" autocomplete="off">
+    <div class="layui-card-body">
+        <div class="layui-form-item">
+            <label class="layui-form-label">开户名</label>
+            <div class="layui-input-block">
+                <input name="username" placeholder="开户名" value="{$vo.username}" class="layui-input">
+                <input type="hidden" name="_csrf_" value="{:systoken('admin/deal/edit_order')}">
+                <input type="hidden" name="id" value="{$vo.id}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">开户银行</label>
+            <div class="layui-input-block">
+                <input name="bankname" value="{$vo.bankname}" placeholder="请输入开户银行" class="layui-input" >
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">开户电话</label>
+            <div class="layui-input-block">
+                <input name="tel"  value="{$vo.tel}" placeholder="请输入开户电话" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">银行卡号</label>
+            <div class="layui-input-block">
+                <input name="cardnum"  value="{$vo.cardnum}" placeholder="请输入银行卡号" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">开户地址</label>
+            <div class="layui-input-block">
+                <input name="address"  value="{$vo.address}" placeholder="请输入开户地址" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">QQ</label>
+            <div class="layui-input-block">
+                <input name="qq"  value="{$vo.qq}" placeholder="请输入QQ" class="layui-input">
+                <input type="text" id="link" value="{$vo.username}、{$vo.bankname}、{$vo.cardnum}" style='opacity: 0'>
+            </div>
+        </div>
+     
+
+    </div>
+
+    <div class="hr-line-dashed"></div>
+
+    <div class="layui-form-item text-center">
+        <button class="layui-btn" type='submit'>提交</button>
+       
+        <button class="layui-btn layui-btn-danger" type='button' data-close>关闭</button>
+        <a href="javascript:void(0);" class="layui-btn" onclick="link()">复制</a>
+    </div>
+
+    <script>window.form.render();</script>
+
+</form>
+<script>
+      function link(){  
+          console.log(123); 
+        $("#link").val();//这里可以获取动态数据赋值给$("#hide").val()
+          $("#link").select();
+          try {var state = document.execCommand("copy");}
+          catch(err){var state = false;}
+          if(state){
+           alert("复制成功")
+          }else{
+            alert("复制失败")
+          }
+    }
+
+</script>
+{/volist}
+{/notempty}
+
